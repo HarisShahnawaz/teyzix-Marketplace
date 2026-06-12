@@ -58,7 +58,7 @@ const CustomerDashboard = () => {
                       {req.service?.title || 'Custom Freelance Project'}
                     </h3>
                     <p className="text-gray-600 text-sm max-w-md">
-                      <strong className="text-gray-700">Project Requirements:</strong> {req.notes || 'No specific notes added.'}
+                   <strong className="text-gray-700">Project Requirements:</strong> {req.requirements || 'No specific notes added.'}
                     </p>
                     <p className="text-xs text-gray-400 font-mono">Order ID: {req._id}</p>
                   </div>

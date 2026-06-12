@@ -1,12 +1,12 @@
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
 
 // Protect routes: Verifies if user is logged in via JWT
-const protect = async (req, res, next) => {
+export const protect = async (req, res, next) => {
   let token;
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     try {
       token = req.headers.authorization.split(' ')[1];
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret');
       req.user = decoded;
       next();
     } catch (error) {
@@ -19,13 +19,13 @@ const protect = async (req, res, next) => {
 };
 
 // Role authorization guard
-const authorizeRoles = (...roles) => {
+export const authorizeRoles = (...roles) => {
   return (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
-      return res.status(403).json({ message: `Role (${req.user.role}) is not allowed to access this resource` });
+    if (!req.user || !roles.includes(req.user.role)) {
+      return res.status(403).json({ 
+        message: `Role (${req.user?.role || 'unknown'}) is not allowed to access this resource` 
+      });
     }
     next();
   };
 };
-
-module.exports = { protect, authorizeRoles };

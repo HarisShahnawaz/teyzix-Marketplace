@@ -7,7 +7,8 @@ import Register from './pages/Register';
 import ProviderDashboard from './dashboards/ProviderDashboard';
 import CustomerDashboard from './dashboards/CustomerDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
-import AIAssistant from './components/AIAssistant'; // Import the AI Assistant
+import AIAssistant from './components/AIAssistant'; 
+import ServiceDetails from './pages/ServiceDetails';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <main className="grow">
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/services/:id" element={<ServiceDetails />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               

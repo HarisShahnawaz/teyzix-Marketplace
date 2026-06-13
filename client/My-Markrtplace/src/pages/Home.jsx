@@ -92,9 +92,11 @@ const Home = () => {
                 className="bg-white dark:bg-slate-900 rounded-xl shadow-md hover:shadow-xl dark:shadow-none border border-gray-100 dark:border-slate-800 flex flex-col justify-between overflow-hidden transition-all duration-300 ease-in-out"
               >
                 <div className="p-6">
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2 tracking-tight transition-colors duration-300">
-                    {service.title}
-                  </h3>
+                  <div className="flex justify-between items-start gap-2 mb-2">
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 tracking-tight mb-0 transition-colors duration-300">
+                      {service.title}
+                    </h3>
+                  </div>
                   <p className="text-slate-600 dark:text-slate-400 text-sm mb-4 line-clamp-3 leading-relaxed transition-colors duration-300">
                     {service.description}
                   </p>
@@ -105,6 +107,18 @@ const Home = () => {
                     <span className="text-xs font-semibold bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-3 py-1 rounded-full capitalize transition-colors duration-300">
                       {service.category}
                     </span>
+                    
+                    {/* 🌟 New Dynamic Average Rating Display */}
+                    <div className="flex items-center text-xs font-medium text-slate-500 dark:text-slate-400">
+                      {service.averageRating && service.averageRating > 0 ? (
+                        <span className="flex items-center gap-1 text-amber-500 font-bold bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-md">
+                          ⭐ {Number(service.averageRating).toFixed(1)}
+                        </span>
+                      ) : (
+                        <span className="text-slate-400 dark:text-slate-500 italic text-xs">No reviews</span>
+                      )}
+                    </div>
+
                     <span className="text-xl font-bold text-green-600 dark:text-green-400 transition-colors duration-300">
                       ${service.price}
                     </span>

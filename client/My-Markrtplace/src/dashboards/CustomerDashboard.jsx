@@ -2,11 +2,14 @@ import { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import { motion } from 'framer-motion';
+import { Star } from 'lucide-react';
 
 const CustomerDashboard = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user } = useContext(AuthContext);
+  const [reviewForm, setReviewForm] = useState({ visible: false, requestId: null, serviceId: null, providerId: null, rating: 5, comment: '' });
+  const [submittingReview, setSubmittingReview] = useState(false);
 
   useEffect(() => {
     const fetchCustomerRequests = async () => {
@@ -22,6 +25,37 @@ const CustomerDashboard = () => {
 
     fetchCustomerRequests();
   }, []);
+
+  const handleLeaveReview = (request) => {
+    setReviewForm({
+      visible: true,
+      requestId: request._id,
+      serviceId: request.service?._id,
+      providerId: request.service?.createdBy,
+      rating: 5,
+      comment: ''
+    });
+  };
+
+  const handleSubmitReview = async (e) => {
+    e.preventDefault();
+    setSubmittingReview(true);
+    try {
+      await axios.post('http://localhost:5000/api/reviews', {
+        serviceId: reviewForm.serviceId,
+        providerId: reviewForm.providerId,
+        rating: reviewForm.rating,
+        comment: reviewForm.comment,
+        requestId: reviewForm.requestId
+      });
+      alert('Review submitted successfully!');
+      setReviewForm({ visible: false, requestId: null, serviceId: null, providerId: null, rating: 5, comment: '' });
+    } catch (error) {
+      alert(error.response?.data?.message || 'Failed to submit review');
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
 
   return (
     <motion.div 
@@ -81,6 +115,18 @@ const CustomerDashboard = () => {
                       {req.status || 'Pending'}
                     </span>
                     <div className="text-lg font-black text-slate-900 dark:text-slate-100 transition-colors duration-300">${req.budget || req.service?.price || '0'}</div>
+                    
+                    {(req.status === 'Completed' || req.status === 'Delivered') && (
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.96 }}
+                        onClick={() => handleLeaveReview(req)}
+                        className="w-full bg-yellow-500 hover:bg-yellow-600 dark:bg-yellow-600 dark:hover:bg-yellow-500 text-white font-medium px-4 py-2 rounded-lg transition-all duration-300 shadow-sm flex items-center justify-center gap-2"
+                      >
+                        <Star size={16} fill="currentColor" />
+                        Leave a Review
+                      </motion.button>
+                    )}
                   </div>
                 </motion.div>
               ))}
@@ -104,6 +150,71 @@ const CustomerDashboard = () => {
         </div>
 
       </div>
+
+      {/* Review Form Modal */}
+      {reviewForm.visible && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white dark:bg-slate-900 rounded-2xl p-6 max-w-md w-full shadow-xl border border-gray-100 dark:border-slate-800 transition-all duration-300 ease-in-out"
+          >
+            <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4 tracking-tight transition-colors duration-300">Leave a Review</h3>
+            <form onSubmit={handleSubmitReview} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 transition-colors duration-300">Rating</label>
+                <div className="flex gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setReviewForm({ ...reviewForm, rating: star })}
+                      className="p-2 rounded-lg transition-all duration-300"
+                    >
+                      <Star 
+                        size={24} 
+                        className={star <= reviewForm.rating ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300 dark:text-slate-600'}
+                        fill={star <= reviewForm.rating ? 'currentColor' : 'none'}
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 transition-colors duration-300">Comment</label>
+                <textarea
+                  required
+                  rows="4"
+                  value={reviewForm.comment}
+                  onChange={(e) => setReviewForm({ ...reviewForm, comment: e.target.value })}
+                  className="w-full p-3 border border-gray-300 dark:border-slate-600 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 transition-all duration-300"
+                  placeholder="Share your experience with this service..."
+                ></textarea>
+              </div>
+              <div className="flex gap-3">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.96 }}
+                  type="submit"
+                  disabled={submittingReview}
+                  className="flex-1 bg-yellow-500 hover:bg-yellow-600 dark:bg-yellow-600 dark:hover:bg-yellow-500 text-white font-medium px-4 py-2 rounded-lg transition-all duration-300 shadow-sm disabled:opacity-50"
+                >
+                  {submittingReview ? 'Submitting...' : 'Submit Review'}
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.96 }}
+                  type="button"
+                  onClick={() => setReviewForm({ visible: false, requestId: null, serviceId: null, providerId: null, rating: 5, comment: '' })}
+                  className="flex-1 bg-gray-200 hover:bg-gray-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-medium px-4 py-2 rounded-lg transition-all duration-300"
+                >
+                  Cancel
+                </motion.button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
     </motion.div>
   );
 };

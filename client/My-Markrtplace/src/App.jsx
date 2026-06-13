@@ -2,11 +2,13 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ProviderDashboard from './dashboards/ProviderDashboard';
 import CustomerDashboard from './dashboards/CustomerDashboard';
+import AdminDashboard from './dashboards/AdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import AIAssistant from './components/AIAssistant'; 
 import ServiceDetails from './pages/ServiceDetails';
@@ -42,11 +44,23 @@ function App() {
                     </ProtectedRoute>
                   } 
                 />
+
+                <Route 
+                  path="/admin-dashboard" 
+                  element={
+                    <ProtectedRoute allowedRoles={['admin']}>
+                      <AdminDashboard />
+                    </ProtectedRoute>
+                  } 
+                />
               </Routes>
             </main>
             
             {/* Render the AI Assistant widget floating over all views */}
             <AIAssistant />
+            
+            {/* Global Footer */}
+            <Footer />
           </div>
         </Router>
       </AuthProvider>

@@ -105,9 +105,25 @@ const ServiceDetails = () => {
           className="lg:col-span-7 bg-white dark:bg-slate-900 rounded-2xl shadow-md border border-gray-100 dark:border-slate-800 overflow-hidden transition-all duration-300 ease-in-out"
         >
           <div className="p-8 space-y-4">
-            <span className="text-xs font-semibold bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-3 py-1 rounded-full uppercase tracking-wider transition-colors duration-300">
-              {service.category}
-            </span>
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-xs font-semibold bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-3 py-1 rounded-full uppercase tracking-wider transition-colors duration-300">
+                {service.category}
+              </span>
+
+              {/* 🌟 New Dynamic Rating Badge for Detailed Listing Panel */}
+              <div className="flex items-center text-xs font-medium">
+                {service.averageRating && service.averageRating > 0 ? (
+                  <span className="flex items-center gap-1 text-amber-600 dark:text-amber-400 font-bold bg-amber-50 dark:bg-amber-950/40 px-2.5 py-1 rounded-md transition-colors duration-300">
+                    ⭐ {Number(service.averageRating).toFixed(1)} Provider Score
+                  </span>
+                ) : (
+                  <span className="text-slate-400 dark:text-slate-500 italic bg-slate-50 dark:bg-slate-800/60 px-2.5 py-1 rounded-md transition-colors duration-300">
+                    No evaluations yet
+                  </span>
+                )}
+              </div>
+            </div>
+
             <h1 className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight leading-tight transition-colors duration-300">
               {service.title}
             </h1>

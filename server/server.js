@@ -9,6 +9,7 @@ import serviceRoutes from './routes/serviceRoutes.js';
 import requestRoutes from './routes/requestRoutes.js';
 import reviewRoutes from './routes/reviewRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ app.use('/api/services', serviceRoutes);
 app.use('/api/requests', requestRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/admin', adminRoutes);
 
 const PORT = process.env.PORT || 5000;
 

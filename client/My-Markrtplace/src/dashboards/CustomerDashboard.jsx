@@ -53,26 +53,27 @@ const CustomerDashboard = () => {
               {requests.map((req) => (
                 <div key={req._id} className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex justify-between items-start hover:shadow-md transition">
                   <div className="space-y-2">
-                    {/* Assuming population of service title from backend schema */}
                     <h3 className="text-lg font-bold text-gray-900 tracking-tight">
                       {req.service?.title || 'Custom Freelance Project'}
                     </h3>
                     <p className="text-gray-600 text-sm max-w-md">
-                   <strong className="text-gray-700">Project Requirements:</strong> {req.requirements || 'No specific notes added.'}
+                      <strong className="text-gray-700">Project Requirements:</strong> {req.requirements || 'No specific notes added.'}
                     </p>
                     <p className="text-xs text-gray-400 font-mono">Order ID: {req._id}</p>
                   </div>
                   
                   <div className="text-right space-y-3">
-                    <span className={`inline-block px-3 py-1 text-xs font-semibold rounded-full uppercase tracking-wider ${
-                      req.status === 'completed' ? 'bg-green-100 text-green-800' :
-                      req.status === 'accepted' ? 'bg-blue-100 text-blue-800' :
-                      req.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                      'bg-amber-100 text-amber-800' // Pending state default
+                    {/* 🚀 FIXED: Dynamic Status matching with exact Sentence Case enum entries */}
+                    <span className={`inline-block px-3 py-1 text-xs font-semibold rounded-full tracking-wider ${
+                      req.status === 'Completed' || req.status === 'Delivered' ? 'bg-green-100 text-green-800' :
+                      req.status === 'Accepted' || req.status === 'In Progress' ? 'bg-blue-100 text-blue-800' :
+                      req.status === 'Rejected' || req.status === 'Cancelled' ? 'bg-red-100 text-red-800' :
+                      'bg-amber-100 text-amber-800' // Matches 'Pending' perfectly
                     }`}>
-                      {req.status || 'pending'}
+                      {req.status || 'Pending'}
                     </span>
-                    <div className="text-lg font-black text-gray-900">${req.price || req.service?.price}</div>
+                    {/* 🚀 FIXED: Set to req.budget to align perfectly with your Mongoose schema */}
+                    <div className="text-lg font-black text-gray-900">${req.budget || req.service?.price || '0'}</div>
                   </div>
                 </div>
               ))}
@@ -80,7 +81,7 @@ const CustomerDashboard = () => {
           )}
         </div>
 
-        {/* Right Column: Dynamic Marketplace Guidelines Widget */}
+        {/* Right Column: Marketplace Guidelines Widget */}
         <div className="space-y-6">
           <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
             <h3 className="text-lg font-bold text-gray-900 mb-4 tracking-tight">Marketplace Tools</h3>

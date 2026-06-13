@@ -64,16 +64,25 @@ const ProviderDashboard = () => {
   };
 
   // ✅ Handle Status Updates (Accept, Reject, Complete) using your backend controller
-  const handleUpdateStatus = async (orderId, newStatus) => {
+ const handleUpdateStatus = async (orderId, newStatus) => {
+    // Ensure the values exactly match your Mongoose schema strings: 'Accepted', 'Completed', etc.
+    let formattedStatus = newStatus;
+    if (newStatus === 'accepted') formattedStatus = 'Accepted';
+    if (newStatus === 'rejected') formattedStatus = 'Rejected'; 
+    if (newStatus === 'completed') formattedStatus = 'Completed';
+
     try {
       await axios.put(`http://localhost:5000/api/requests/${orderId}`, {
-        status: newStatus
+        status: formattedStatus
       });
-      alert(`💼 Order status marked as ${newStatus}!`);
-      fetchData(); // Refresh lists to show new status instantly
+      
+      alert(`💼 Order status marked as ${formattedStatus}!`);
+      fetchData(); // Refresh list to reflect the new state instantly!
     } catch (error) {
-      console.error("Error updating status:", error);
-      alert(error.response?.data?.message || 'Failed to update order status.');
+      console.log("=== BACKEND STATUS UPDATE ERROR ===");
+      console.log(error.response?.data);
+      console.log("===================================");
+      alert(error.response?.data?.error || error.response?.data?.message || 'Failed to update order status.');
     }
   };
 
@@ -81,7 +90,7 @@ const ProviderDashboard = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 font-sans">
       
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-green-600 to-teal-700 rounded-2xl p-8 text-white shadow-sm mb-10">
+      <div className="bg-linear-to-r from-green-600 to-teal-700 rounded-2xl p-8 text-white shadow-sm mb-10">
         <h1 className="text-3xl font-bold tracking-tight">Seller Workspace</h1>
         <p className="text-green-100 mt-1 text-sm">Welcome back, {user?.name}. Manage your listings and fulfill client requests.</p>
       </div>
@@ -160,10 +169,8 @@ const ProviderDashboard = () => {
                     <div className="flex items-center space-x-4 justify-between md:justify-end border-t md:border-0 pt-3 md:pt-0">
                       <span className="text-lg font-black text-green-600">${order.budget || order.service?.price}</span>
                       
-                      {/* Action state management control buttons */}
                      <div className="flex space-x-2">
-  {/* Normalize status matching to lowercase just in case */}
-  {(order.status?.toLowerCase() === 'pending' || !order.status) && (
+  {(order.status === 'Pending' || !order.status) && (
     <>
       <button 
         onClick={() => handleUpdateStatus(order._id, 'accepted')} 
@@ -172,14 +179,14 @@ const ProviderDashboard = () => {
         Accept
       </button>
       <button 
-        onClick={() => handleUpdateStatus(order._id, 'rejected')} 
+        onClick={() => handleUpdateStatus(order._id, 'completed')} // Direct to complete or keep a deny flow if added to schema later
         className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg text-xs font-semibold transition"
       >
         Reject
       </button>
     </>
   )}
-  {order.status?.toLowerCase() === 'accepted' && (
+  {order.status === 'Accepted' && (
     <button 
       onClick={() => handleUpdateStatus(order._id, 'completed')} 
       className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-semibold transition shadow-sm"

@@ -1,8 +1,9 @@
 import { useEffect, useState, useContext } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import { motion } from 'framer-motion';
+import { Clock, RefreshCw, Star, ShieldAlert, ChevronRight, MessageSquare, Tag } from 'lucide-react';
 
 const ServiceDetails = () => {
   const { id } = useParams();
@@ -15,10 +16,12 @@ const ServiceDetails = () => {
   const [customDays, setCustomDays] = useState('');
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [activeTab, setActiveTab] = useState('standard'); 
 
   useEffect(() => {
     const fetchServiceDetails = async () => {
       try {
+        // Safe Fallback: Fetching full array and filtering client-side
         const { data } = await axios.get(`http://localhost:5000/api/services`);
         const foundService = data.find(s => s._id === id);
         setService(foundService);
@@ -37,18 +40,32 @@ const ServiceDetails = () => {
     fetchServiceDetails();
   }, [id]);
 
+  // 🎨 Smart category fallback images synchronized with homepage architecture
+  const getCategoryFallback = (category) => {
+    const cat = category?.toLowerCase() || '';
+    if (cat.includes('design') || cat.includes('graphic')) {
+      return "https://images.unsplash.com/photo-1626785774573-4b799315345d?q=80&w=1200&auto=format&fit=crop";
+    }
+    if (cat.includes('marketing') || cat.includes('digital')) {
+      return "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1200&auto=format&fit=crop";
+    }
+    return "https://images.unsplash.com/photo-1618477388954-7852f32655ec?q=80&w=1200&auto=format&fit=crop";
+  };
+
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
     setSubmitting(true);
 
-    const deliveryDaysInt = parseInt(customDays) || 7;
+    const finalBudget = activeTab === 'standard' ? service.price : Number(customBudget);
+    const finalDays = activeTab === 'standard' ? (parseInt(service.deliveryTime) || 7) : (parseInt(customDays) || 7);
+
     const deadlineDate = new Date();
-    deadlineDate.setDate(deadlineDate.getDate() + deliveryDaysInt);
+    deadlineDate.setDate(deadlineDate.getDate() + finalDays);
 
     const providerId = service.createdBy?._id || service.createdBy;
 
     if (!providerId) {
-      alert("Error: Could not locate the Service Provider ID (createdBy) for this listing.");
+      alert("Error: Could not locate the Service Provider ID.");
       setSubmitting(false);
       return;
     }
@@ -57,18 +74,16 @@ const ServiceDetails = () => {
       const payload = {
         provider: providerId,
         service: service._id,
-        requirements: notes,
-        budget: Number(customBudget),
+        requirements: notes || `Standard checkout delivery request for: ${service.title}`,
+        budget: finalBudget,
         deadline: deadlineDate.toISOString()
       };
 
       await axios.post('http://localhost:5000/api/requests', payload);
-
       alert('🎉 Order request submitted successfully!');
       navigate('/customer-dashboard');
     } catch (error) {
-      console.log("Full Backend Error Data:", error.response?.data);
-      alert(error.response?.data?.error || error.response?.data?.message || 'Failed to submit order request.');
+      alert(error.response?.data?.error || 'Failed to submit order request.');
     } finally {
       setSubmitting(false);
     }
@@ -76,152 +91,252 @@ const ServiceDetails = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 transition-all duration-300 ease-in-out">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-950">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#1dbf73]"></div>
       </div>
     );
   }
 
   if (!service) {
     return (
-      <div className="text-center py-12">
-        <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200 transition-colors duration-300">Service not found.</h2>
+      <div className="text-center py-16 min-h-[60vh] flex flex-col items-center justify-center">
+        <h2 className="text-xl font-bold text-[#222325] dark:text-slate-200">Service not found.</h2>
       </div>
     );
   }
 
-  return (
-    <motion.div 
-      initial={{ opacity: 0, y: 15 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
-      className="max-w-7xl mx-auto px-4 py-12 font-sans"
-    >
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
-        {/* Left Side: Service Baseline Details - lg:col-span-7 */}
-        <motion.div 
-          whileHover={{ y: -4 }}
-          className="lg:col-span-7 bg-white dark:bg-slate-900 rounded-2xl shadow-md border border-gray-100 dark:border-slate-800 overflow-hidden transition-all duration-300 ease-in-out"
-        >
-          <div className="p-8 space-y-4">
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="text-xs font-semibold bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-3 py-1 rounded-full uppercase tracking-wider transition-colors duration-300">
-                {service.category}
-              </span>
+  const cardBanner = service.image || service.coverImage || service.banner || (service.images && service.images.length > 0 ? service.images[0] : null) || getCategoryFallback(service.category);
+  const sellerName = service.createdBy?.name || "Haris";
+  const initials = sellerName.substring(0, 2).toUpperCase();
 
-              {/* 🌟 New Dynamic Rating Badge for Detailed Listing Panel */}
-              <div className="flex items-center text-xs font-medium">
-                {service.averageRating && service.averageRating > 0 ? (
-                  <span className="flex items-center gap-1 text-amber-600 dark:text-amber-400 font-bold bg-amber-50 dark:bg-amber-950/40 px-2.5 py-1 rounded-md transition-colors duration-300">
-                    ⭐ {Number(service.averageRating).toFixed(1)} Provider Score
-                  </span>
-                ) : (
-                  <span className="text-slate-400 dark:text-slate-500 italic bg-slate-50 dark:bg-slate-800/60 px-2.5 py-1 rounded-md transition-colors duration-300">
-                    No evaluations yet
+  return (
+    <div className="bg-white dark:bg-slate-950 min-h-screen transition-colors duration-300">
+      <motion.div 
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 font-sans text-[#404145] dark:text-slate-300"
+      >
+        {/* 🧭 Aligned Breadcrumb Header */}
+        <div className="text-xs font-medium text-[#74767e] mb-6 flex items-center gap-1.5">
+          <Link to="/" className="hover:text-[#1dbf73] transition-colors">Marketplace</Link> 
+          <ChevronRight size={12} className="text-slate-400" />
+          <span className="font-semibold text-[#222325] dark:text-slate-300 capitalize">
+            {service.category || "Web Development"}
+          </span>
+        </div>
+
+        {/* 📦 Master Grid System */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+          
+          {/* ================= LEFT MAIN CONTENT PANEL (8 Columns) ================= */}
+          <div className="lg:col-span-8 space-y-8">
+            
+            {/* Title */}
+            <h1 className="text-2xl md:text-3xl font-extrabold text-[#222325] dark:text-slate-100 leading-tight tracking-tight capitalize">
+              {service.title}
+            </h1> 
+
+            {/* Seller Quick Info Meta Bar */}
+            <div className="flex items-center gap-3 border-b border-slate-100 dark:border-slate-800/80 pb-5 text-sm">
+              <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#1dbf73] to-emerald-600 text-white font-bold flex items-center justify-center text-sm uppercase shadow-sm">
+                {initials}
+              </div>
+              <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                <span className="font-bold text-[#222325] dark:text-slate-100">
+                  {sellerName}
+                </span>
+                <span className="text-xs bg-emerald-50 dark:bg-emerald-950/40 text-[#1dbf73] px-2 py-0.5 rounded font-bold">
+                  Top Rated Seller
+                </span>
+                <span className="text-slate-300 dark:text-slate-700 hidden sm:inline">|</span>
+                <div className="flex items-center gap-1 text-xs font-bold text-[#222325] dark:text-slate-200">
+                  <Star size={14} className="fill-[#ffb33e] text-[#ffb33e]" /> 
+                  <span>{service.averageRating ? Number(service.averageRating).toFixed(1) : "5.0"}</span>
+                  <span className="text-[#74767e] font-normal">({service.reviewCount || 1} reviews)</span>
+                </div>
+              </div>
+            </div>
+
+            {/* 📸 Clean Display Showcase Banner Area */}
+            <div className="w-full h-[240px] sm:h-[360px] md:h-[420px] rounded-lg overflow-hidden bg-slate-50 dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 shadow-sm relative">
+              <img 
+                src={cardBanner} 
+                alt={service.title} 
+                className="w-full h-full object-cover"
+                onError={(e) => { e.target.src = getCategoryFallback(service.category); }}
+              />
+            </div>
+
+            {/* About This Gig Content Area */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <h2 className="text-xl font-bold text-[#222325] dark:text-slate-100">
+                  About This Gig
+                </h2>
+                {service.category && (
+                  <span className="flex items-center gap-1 text-[10px] font-medium text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md capitalize">
+                    <Tag size={10} className="text-slate-400" />
+                    {service.category}
                   </span>
                 )}
               </div>
+              <p className="text-[15px] text-[#404145] dark:text-slate-300 leading-relaxed whitespace-pre-line font-normal tracking-wide">
+                {service.description || "No description provided for this marketplace listing."}
+              </p>
             </div>
 
-            <h1 className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight leading-tight transition-colors duration-300">
-              {service.title}
-            </h1>
-            <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed whitespace-pre-line transition-colors duration-300">
-              {service.description}
-            </p>
-            
-            <div className="pt-4 border-t border-gray-100 dark:border-slate-800 grid grid-cols-2 gap-4 transition-colors duration-300">
-              <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl transition-colors duration-300">
-                <span className="block text-xs text-slate-400 dark:text-slate-500 font-medium transition-colors duration-300">Standard Rate</span>
-                <span className="text-xl font-bold text-slate-800 dark:text-slate-200 transition-colors duration-300">${service.price}</span>
-              </div>
-              <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl transition-colors duration-300">
-                <span className="block text-xs text-slate-400 dark:text-slate-500 font-medium transition-colors duration-300">Standard Delivery</span>
-                <span className="text-xl font-bold text-slate-800 dark:text-slate-200 transition-colors duration-300">{service.deliveryTime}</span>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Right Side: Negotiable Order Checkout Form - lg:col-span-5 */}
-        <motion.div 
-          whileHover={{ y: -4 }}
-          className="lg:col-span-5 bg-slate-50 dark:bg-slate-900 rounded-2xl shadow-md border border-gray-100 dark:border-slate-800 overflow-hidden transition-all duration-300 ease-in-out"
-        >
-          <div className="p-8 flex flex-col justify-between">
-            <div className="space-y-4">
-              <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 tracking-tight transition-colors duration-300">Customize Your Order Offer</h2>
-              
-              {user?.role === 'customer' ? (
-                <form onSubmit={handlePlaceOrder} className="space-y-4">
-                  
-                  {/* Custom Budget & Timeline Row */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2 transition-colors duration-300">
-                        Your Offer Budget ($)
-                      </label>
-                      <input
-                        type="number"
-                        required
-                        min="5"
-                        value={customBudget}
-                        onChange={(e) => setCustomBudget(e.target.value)}
-                        className="block w-full p-3.5 border border-gray-300 dark:border-slate-600 rounded-xl shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-semibold transition-all duration-300"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2 transition-colors duration-300">
-                        Delivery Days
-                      </label>
-                      <input
-                        type="number"
-                        required
-                        min="1"
-                        value={customDays}
-                        onChange={(e) => setCustomDays(e.target.value)}
-                        className="block w-full p-3.5 border border-gray-300 dark:border-slate-600 rounded-xl shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-semibold transition-all duration-300"
-                      />
-                    </div>
+            {/* Premium Modular Identity Component */}
+            <div className="border border-slate-200 dark:border-slate-800 rounded-xl p-6 bg-white dark:bg-slate-900/50 shadow-xs">
+              <h3 className="text-base font-bold text-[#222325] dark:text-slate-100 mb-4">About The Seller</h3>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-full bg-gradient-to-tr from-[#1dbf73] to-emerald-600 text-white font-black flex items-center justify-center text-lg uppercase shadow-sm">
+                    {initials}
                   </div>
-
-                  {/* Requirements Instructions */}
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2 transition-colors duration-300">
-                      Project Instructions
-                    </label>
-                    <textarea
-                      rows="4"
-                      required
-                      value={notes}
-                      onChange={(e) => setNotes(e.target.value)}
-                      className="block w-full p-3.5 border border-gray-300 dark:border-slate-600 rounded-xl shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 transition-all duration-300"
-                      placeholder="Describe your design guidelines, tech specifications, or unique instructions..."
-                    ></textarea>
+                    <h4 className="font-bold text-[#222325] dark:text-slate-200 text-base">
+                      {sellerName}
+                    </h4>
+                    <p className="text-xs text-[#74767e] dark:text-slate-400 mt-0.5">
+                      Full Stack MERN Developer & Systems Engineer
+                    </p>
+                    <div className="flex items-center gap-1 text-xs text-[#ffb33e] font-bold mt-1">
+                      <Star size={12} className="fill-[#ffb33e] text-[#ffb33e]" />
+                      <span>5.0 Exceptional Performance Profile</span>
+                    </div>
                   </div>
-
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.96 }}
-                    type="submit"
-                    disabled={submitting}
-                    className="w-full py-3.5 px-4 bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-500 text-white font-bold rounded-xl shadow-md transition-all duration-300 disabled:opacity-50 text-sm tracking-wide mt-2"
-                  >
-                    {submitting ? 'Submitting Order Proposal...' : 'Send Custom Project Order'}
-                  </motion.button>
-                </form>
-              ) : (
-                <div className="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-xl p-4 text-xs text-amber-800 dark:text-amber-400 leading-relaxed transition-all duration-300">
-                  🔒 Only logged-in **Customers** can configure and transmit order proposals to providers.
                 </div>
-              )}
+                <button className="text-xs font-bold border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-[#404145] dark:text-slate-300 px-4 py-2.5 rounded-md transition-all flex items-center justify-center gap-1.5 self-start sm:self-center">
+                  <MessageSquare size={13} /> Contact Me
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          {/* ================= RIGHT SIDEBAR PRICE CHECKOUT BOX (4 Columns) ================= */}
+          <div className="lg:col-span-4 lg:sticky lg:top-24 mt-4 lg:mt-0">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg shadow-md overflow-hidden">
+              
+              {/* Tab Selector Headers */}
+              <div className="grid grid-cols-2 text-center border-b border-slate-200 dark:border-slate-800 font-bold text-xs uppercase tracking-wider bg-slate-50 dark:bg-slate-900/50">
+                <button 
+                  onClick={() => setActiveTab('standard')}
+                  className={`py-4 px-2 transition-all font-bold ${activeTab === 'standard' ? 'border-b-2 border-[#1dbf73] text-[#1dbf73] bg-white dark:bg-slate-900' : 'text-[#74767e] hover:text-[#222325] dark:hover:text-slate-200'}`}
+                >
+                  Standard Price
+                </button>
+                <button 
+                  onClick={() => setActiveTab('custom')}
+                  className={`py-4 px-2 transition-all font-bold ${activeTab === 'custom' ? 'border-b-2 border-[#1dbf73] text-[#1dbf73] bg-white dark:bg-slate-900' : 'text-[#74767e] hover:text-[#222325] dark:hover:text-slate-200'}`}
+                >
+                  Custom Offer
+                </button>
+              </div>
+
+              {/* Package Interior Wrapper */}
+              <div className="p-6 space-y-5">
+                
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs font-bold text-[#222325] dark:text-slate-400 uppercase tracking-wide">
+                    {activeTab === 'standard' ? 'BASELINE FIXED TIER' : 'Negotiated Rate Proposal'}
+                  </span>
+                  <span className="text-xl font-extrabold text-[#222325] dark:text-slate-100">
+                    {activeTab === 'standard' ? `PKR ${Number(service.price).toLocaleString()}` : 'Customized'}
+                  </span>
+                </div>
+
+                <p className="text-xs text-[#62646a] dark:text-slate-400 leading-relaxed font-normal">
+                  {activeTab === 'standard' 
+                    ? "Receive professional grade build deployments matching standard core architecture structures outlined in description scopes."
+                    : "Propose personalized architectural project deliverables, specific technical scope items, or custom budgets directly to this seller."
+                  }
+                </p>
+
+                {/* Delivery Metrics Context Line */}
+                <div className="flex items-center gap-4 text-xs font-bold text-[#62646a] dark:text-slate-400 border-b border-slate-100 dark:border-slate-800/60 pb-4">
+                  <span className="flex items-center gap-1.5">
+                    <Clock size={14} className="text-slate-400" /> 
+                    {activeTab === 'standard' ? `${service.deliveryTime || 10} Days` : `${customDays || '—'} Days`} Delivery
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <RefreshCw size={13} className="text-slate-400" /> 
+                    Unlimited Revisions
+                  </span>
+                </div>
+
+                {/* Secure Verification Gateways */}
+                {user?.role === 'customer' ? (
+                  <form onSubmit={handlePlaceOrder} className="space-y-4 pt-1">
+                    {activeTab === 'custom' && (
+                      <motion.div 
+                        initial={{ opacity: 0, y: -5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="grid grid-cols-2 gap-3"
+                      >
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Offer Budget (PKR)</label>
+                          <input
+                            type="number"
+                            required
+                            min="5"
+                            value={customBudget}
+                            onChange={(e) => setCustomBudget(e.target.value)}
+                            className="w-full p-2 border border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-sm font-bold focus:outline-none focus:border-[#1dbf73] text-[#222325] dark:text-slate-100"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Days Duration</label>
+                          <input
+                            type="number"
+                            required
+                            min="1"
+                            value={customDays}
+                            onChange={(e) => setCustomDays(e.target.value)}
+                            className="w-full p-2 border border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-sm font-bold focus:outline-none focus:border-[#1dbf73] text-[#222325] dark:text-slate-100"
+                          />
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* Requirements Area */}
+                    <div className="space-y-1.5">
+                      <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Project Requirements</label>
+                      <textarea
+                        rows={activeTab === 'standard' ? 3 : 4}
+                        required={activeTab === 'custom'}
+                        value={notes}
+                        onChange={(e) => setNotes(e.target.value)}
+                        placeholder={activeTab === 'standard' ? "Add optional baseline delivery specifications or technical requirements..." : "Provide clear design criteria, specialized integration endpoints, or target deployment instructions..."}
+                        className="w-full p-3 border border-slate-300 dark:border-slate-700 rounded text-xs bg-white dark:bg-slate-800 text-[#404145] dark:text-slate-200 focus:outline-none focus:border-[#1dbf73] focus:ring-1 focus:ring-[#1dbf73] leading-relaxed transition-all"
+                      ></textarea>
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={submitting}
+                      className="w-full py-3 bg-[#1dbf73] hover:bg-[#19a463] text-white font-bold rounded text-sm tracking-wide transition-all duration-150 transform active:scale-[0.99] disabled:opacity-50 flex items-center justify-center gap-2"
+                    >
+                      {submitting ? 'Processing Order...' : activeTab === 'standard' ? 'Continue Standard Checkout' : 'Submit Custom Offer'}
+                    </button>
+                  </form>
+                ) : (
+                  <div className="bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/40 rounded-md p-3.5 text-xs text-amber-800 dark:text-amber-400 leading-relaxed font-medium flex gap-2.5 items-start">
+                    <ShieldAlert size={16} className="flex-shrink-0 mt-0.5 text-amber-600 dark:text-amber-500" />
+                    <span>
+                      Please sign in with a standard <strong>Customer Account</strong> to process order checkouts or request custom project details with this provider.
+                    </span>
+                  </div>
+                )}
+
+              </div>
             </div>
           </div>
-        </motion.div>
 
-      </div>
-    </motion.div>
+        </div>
+      </motion.div>
+    </div>
   );
 };
 

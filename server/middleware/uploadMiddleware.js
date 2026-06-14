@@ -32,14 +32,15 @@ const fileFilter = (req, file, cb) => {
   if (extname && mimetype) {
     cb(null, true);
   } else {
-    cb(new Error('Only image files are allowed (jpeg, jpg, png, gif, webp)'));
+    cb(new Error('Only image files are allowed (jpeg, jpg, png, gif, webp)'), false);
   }
 };
 
 const upload = multer({
   storage: storage,
   limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB limit
+    // 🟩 Raised from 5MB to 10MB to handle high-res photography banners safely
+    fileSize: 10 * 1024 * 1024 
   },
   fileFilter: fileFilter
 });

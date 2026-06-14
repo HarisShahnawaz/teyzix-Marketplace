@@ -76,16 +76,16 @@ const CustomerDashboard = () => {
         
         {/* Left Column: Order History list - lg:col-span-3 */}
         <div className="lg:col-span-3 space-y-6">
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight transition-colors duration-300">Your Sent Order Requests</h2>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-zinc-100 tracking-tight transition-colors duration-300">Your Sent Order Requests</h2>
           
           {loading ? (
             <div className="flex justify-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600"></div>
             </div>
           ) : requests.length === 0 ? (
-            <div className="bg-white dark:bg-slate-900 rounded-xl p-8 border border-gray-100 dark:border-slate-800 shadow-sm text-center transition-all duration-300 ease-in-out">
-              <p className="text-slate-500 dark:text-slate-400 text-sm transition-colors duration-300">You haven't placed any service orders yet.</p>
-              <p className="text-xs text-slate-400 dark:text-slate-500 mt-1 transition-colors duration-300">Head over to the home page to explore professional services!</p>
+            <div className="bg-white dark:bg-zinc-900 rounded-xl p-8 border border-gray-100 dark:border-zinc-800 shadow-sm text-center transition-all duration-300 ease-in-out">
+              <p className="text-slate-500 dark:text-zinc-400 text-sm transition-colors duration-300">You haven't placed any service orders yet.</p>
+              <p className="text-xs text-slate-400 dark:text-zinc-500 mt-1 transition-colors duration-300">Head over to the home page to explore professional services!</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -93,16 +93,16 @@ const CustomerDashboard = () => {
                 <motion.div
                   key={req._id}
                   whileHover={{ y: -4, scale: 1.01 }}
-                  className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-gray-100 dark:border-slate-800 shadow-md hover:shadow-xl dark:shadow-none flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 transition-all duration-300 ease-in-out"
+                  className="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-md hover:shadow-xl dark:shadow-none flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 transition-all duration-300 ease-in-out"
                 >
                   <div className="space-y-2">
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 tracking-tight transition-colors duration-300">
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-zinc-100 tracking-tight transition-colors duration-300">
                       {req.service?.title || 'Custom Freelance Project'}
                     </h3>
-                    <p className="text-slate-600 dark:text-slate-400 text-sm max-w-md transition-colors duration-300">
-                      <strong className="text-slate-700 dark:text-slate-300">Project Requirements:</strong> {req.requirements || 'No specific notes added.'}
+                    <p className="text-slate-600 dark:text-zinc-400 text-sm max-w-md transition-colors duration-300">
+                      <strong className="text-slate-700 dark:text-zinc-300">Project Requirements:</strong> {req.requirements || 'No specific notes added.'}
                     </p>
-                    <p className="text-xs text-slate-400 dark:text-slate-500 font-mono transition-colors duration-300">Order ID: {req._id}</p>
+                    <p className="text-xs text-slate-400 dark:text-zinc-500 font-mono transition-colors duration-300">Order ID: {req._id}</p>
                   </div>
                   
                   <div className="text-right space-y-3">
@@ -114,7 +114,7 @@ const CustomerDashboard = () => {
                     }`}>
                       {req.status || 'Pending'}
                     </span>
-                    <div className="text-lg font-black text-slate-900 dark:text-slate-100 transition-colors duration-300">${req.budget || req.service?.price || '0'}</div>
+                    <div className="text-lg font-black text-slate-900 dark:text-zinc-100 transition-colors duration-300">${req.budget || req.service?.price || '0'}</div>
                     
                     {(req.status === 'Completed' || req.status === 'Delivered') && (
                       <motion.button
@@ -136,13 +136,13 @@ const CustomerDashboard = () => {
 
         {/* Right Column: Marketplace Guidelines Widget - lg:col-span-1 */}
         <div className="lg:col-span-1 space-y-6">
-          <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-gray-100 dark:border-slate-800 shadow-md transition-all duration-300 ease-in-out">
-            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-4 tracking-tight transition-colors duration-300">Marketplace Tools</h3>
+          <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-md transition-all duration-300 ease-in-out">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-zinc-100 mb-4 tracking-tight transition-colors duration-300">Marketplace Tools</h3>
             <div className="space-y-3">
-              <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-gray-100 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-400 leading-relaxed transition-all duration-300">
+              <div className="p-3 bg-slate-50 dark:bg-zinc-800/50 rounded-lg border border-gray-100 dark:border-zinc-700 text-xs text-slate-600 dark:text-zinc-400 leading-relaxed transition-all duration-300">
                  Need a custom integration? Tap into your **AI Assistant** in the bottom right corner to generate technical project guidelines instantly!
               </div>
-              <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-gray-100 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-400 leading-relaxed transition-all duration-300">
+              <div className="p-3 bg-slate-50 dark:bg-zinc-800/50 rounded-lg border border-gray-100 dark:border-zinc-700 text-xs text-slate-600 dark:text-zinc-400 leading-relaxed transition-all duration-300">
                  All payments are safely processed and protected through secure tokens until milestone delivery confirmations.
               </div>
             </div>
@@ -157,12 +157,12 @@ const CustomerDashboard = () => {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white dark:bg-slate-900 rounded-2xl p-6 max-w-md w-full shadow-xl border border-gray-100 dark:border-slate-800 transition-all duration-300 ease-in-out"
+            className="bg-white dark:bg-zinc-900 rounded-2xl p-6 max-w-md w-full shadow-xl border border-gray-100 dark:border-zinc-800 transition-all duration-300 ease-in-out"
           >
-            <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4 tracking-tight transition-colors duration-300">Leave a Review</h3>
+            <h3 className="text-xl font-bold text-slate-900 dark:text-zinc-100 mb-4 tracking-tight transition-colors duration-300">Leave a Review</h3>
             <form onSubmit={handleSubmitReview} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 transition-colors duration-300">Rating</label>
+                <label className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-2 transition-colors duration-300">Rating</label>
                 <div className="flex gap-2">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button
@@ -173,7 +173,7 @@ const CustomerDashboard = () => {
                     >
                       <Star 
                         size={24} 
-                        className={star <= reviewForm.rating ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300 dark:text-slate-600'}
+                        className={star <= reviewForm.rating ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300 dark:text-zinc-600'}
                         fill={star <= reviewForm.rating ? 'currentColor' : 'none'}
                       />
                     </button>
@@ -181,13 +181,13 @@ const CustomerDashboard = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 transition-colors duration-300">Comment</label>
+                <label className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-2 transition-colors duration-300">Comment</label>
                 <textarea
                   required
                   rows="4"
                   value={reviewForm.comment}
                   onChange={(e) => setReviewForm({ ...reviewForm, comment: e.target.value })}
-                  className="w-full p-3 border border-gray-300 dark:border-slate-600 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 transition-all duration-300"
+                  className="w-full p-3 border border-gray-300 dark:border-zinc-600 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 bg-slate-50 dark:bg-zinc-800 text-slate-900 dark:text-zinc-100 transition-all duration-300"
                   placeholder="Share your experience with this service..."
                 ></textarea>
               </div>
@@ -206,7 +206,7 @@ const CustomerDashboard = () => {
                   whileTap={{ scale: 0.96 }}
                   type="button"
                   onClick={() => setReviewForm({ visible: false, requestId: null, serviceId: null, providerId: null, rating: 5, comment: '' })}
-                  className="flex-1 bg-gray-200 hover:bg-gray-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-medium px-4 py-2 rounded-lg transition-all duration-300"
+                  className="flex-1 bg-gray-200 hover:bg-gray-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 text-slate-700 dark:text-zinc-200 font-medium px-4 py-2 rounded-lg transition-all duration-300"
                 >
                   Cancel
                 </motion.button>

@@ -30,14 +30,14 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 transition-all duration-300 sticky top-0 z-50">
+    <nav className="bg-white dark:bg-zinc-900 border-b border-slate-200 dark:border-zinc-800 transition-all duration-300 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 gap-4">
           
           {/* Left Block: Premium Geometric Brand Token */}
           <div className="flex items-center flex-shrink-0">
-            <Link to="/" className="text-2xl font-black text-[#222325] dark:text-white tracking-tighter select-none">
-              Teyzix<span className="text-[#1dbf73]">Market.</span>
+            <Link to="/" className="text-2xl font-black text-[#222325] dark:!text-white tracking-tighter select-none">
+              Teyzix<span className="text-[#1dbf73] dark:!text-white">Market.</span>
             </Link>
           </div>
 
@@ -48,18 +48,18 @@ const Navbar = () => {
               placeholder="What service are you looking for today?"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-10 pl-4 pr-12 border border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-xs font-normal text-[#404145] dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:border-slate-400 dark:focus:border-slate-500 transition-all"
+              className="w-full h-10 pl-4 pr-12 border border-slate-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-800 text-xs font-normal text-[#404145] dark:text-zinc-200 placeholder-slate-400 focus:outline-none focus:border-slate-400 dark:focus:border-zinc-500 transition-all"
             />
             <button 
               type="submit" 
-              className="absolute right-0 top-0 h-10 w-11 bg-[#222325] hover:bg-black dark:bg-slate-800 dark:hover:bg-slate-700 text-white rounded-r flex items-center justify-center transition-colors"
+              className="absolute right-0 top-0 h-10 w-11 bg-[#222325] hover:bg-black dark:bg-zinc-800 dark:hover:bg-zinc-700 text-white rounded-r flex items-center justify-center transition-colors"
             >
               <Search size={16} strokeWidth={2.5} />
             </button>
           </form>
 
           {/* Right Block: Actions & Context Menus */}
-          <div className="hidden md:flex items-center space-x-5 text-[14px] font-bold text-[#62646a] dark:text-slate-300">
+          <div className="hidden md:flex items-center space-x-5 text-[14px] font-bold text-[#62646a] dark:text-zinc-300">
             <Link to="/" className="hover:text-[#1dbf73] transition-colors">
               Browse
             </Link>
@@ -84,7 +84,7 @@ const Navbar = () => {
 
                 <button
                   onClick={toggleTheme}
-                  className="p-1.5 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                  className="p-1.5 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200 transition-colors"
                   aria-label="Toggle layout theme"
                 >
                   {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
@@ -97,13 +97,13 @@ const Navbar = () => {
                   </div>
                   
                   <div className="absolute right-0 top-full pt-2 hidden group-hover:block w-48 transition-all">
-                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded shadow-xl py-2 flex flex-col font-medium text-slate-700 dark:text-slate-300">
-                      <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-800 font-bold text-xs text-[#222325] dark:text-slate-100 line-clamp-1">
+                    <div className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded shadow-xl py-2 flex flex-col font-medium text-slate-700 dark:text-zinc-300">
+                      <div className="px-4 py-2 border-b border-slate-100 dark:border-zinc-800 font-bold text-xs text-[#222325] dark:!text-white line-clamp-1">
                         {user.name}
                       </div>
                       <button 
                         onClick={handleLogout} 
-                        className="px-4 py-2 text-left hover:bg-slate-50 dark:hover:bg-slate-800 text-rose-600 dark:text-rose-400 text-xs flex items-center gap-2 font-semibold"
+                        className="px-4 py-2 text-left hover:bg-slate-50 dark:hover:bg-zinc-800 text-rose-600 dark:text-rose-400 text-xs flex items-center gap-2 font-semibold"
                       >
                         <LogOut size={14} /> Sign Out
                       </button>
@@ -115,7 +115,7 @@ const Navbar = () => {
               <>
                 <button
                   onClick={toggleTheme}
-                  className="p-1.5 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                  className="p-1.5 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200"
                 >
                   {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
                 </button>
@@ -133,7 +133,7 @@ const Navbar = () => {
           <div className="md:hidden flex items-center space-x-2">
             <button
               onClick={toggleTheme}
-              className="p-2 text-slate-500 dark:text-slate-400"
+              className="p-2 text-slate-500 dark:text-zinc-400"
             >
               {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
             </button>
@@ -149,14 +149,14 @@ const Navbar = () => {
 
       {/* Mobile Drawer Menu Overlays */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 px-4 py-4 space-y-3 font-semibold text-slate-700 dark:text-slate-300 text-sm">
+        <div className="md:hidden bg-white dark:bg-zinc-900 border-t border-slate-200 dark:border-zinc-800 px-4 py-4 space-y-3 font-semibold text-slate-700 dark:text-zinc-300 text-sm">
           <form onSubmit={handleSearchSubmit} className="flex relative w-full mb-2">
             <input
               type="text"
               placeholder="Search services..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-10 pl-3 pr-10 border border-slate-300 dark:border-slate-700 rounded text-xs bg-slate-50 dark:bg-slate-800"
+              className="w-full h-10 pl-3 pr-10 border border-slate-300 dark:border-zinc-700 rounded text-xs bg-slate-50 dark:bg-zinc-800"
             />
             <button type="submit" className="absolute right-3 top-2.5 text-slate-400">
               <Search size={16} />
@@ -184,15 +184,15 @@ const Navbar = () => {
                   Admin Panel Dashboard
                 </Link>
               )}
-              <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-3">
-                <span className="text-xs text-slate-400 font-bold block">Logged as: {user.name}</span>
+              <div className="pt-2 border-t border-slate-100 dark:border-zinc-800 flex flex-col gap-3">
+                <span className="text-xs text-slate-400 dark:!text-white font-bold block">Logged as: {user.name}</span>
                 <button onClick={handleLogout} className="w-full text-left py-2 text-rose-500 text-xs font-bold">
                   Sign Out Account
                 </button>
               </div>
             </>
           ) : (
-            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-4">
+            <div className="pt-2 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-between gap-4">
               <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="hover:text-[#1dbf73]">
                 Sign In
               </Link>

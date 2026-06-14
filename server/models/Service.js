@@ -6,6 +6,7 @@ const ServiceSchema = new mongoose.Schema({
   category: { type: String, required: true },
   price: { type: Number, required: true },
   deliveryTime: { type: String, required: true }, // e.g., "3 Days"
+  image: { type: String },
   createdBy: { 
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'User', 

@@ -3,6 +3,7 @@ import Service from '../models/Service.js';
 export const createService = async (req, res) => {
   try {
     const { title, description, category, price, deliveryTime } = req.body;
+    const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
 
     const service = new Service({
       title,
@@ -10,6 +11,7 @@ export const createService = async (req, res) => {
       category,
       price,
       deliveryTime,
+      image: imagePath,
       createdBy: req.user.id
     });
 

@@ -64,7 +64,7 @@ const Footer = () => {
         {/* Attribution */}
         <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 transition-colors duration-300">
           <p className="text-center text-slate-500 dark:text-slate-500 text-sm transition-colors duration-300">
-            © 2026 Teyzix Core Internship. All rights reserved.
+            © 2026 Teyzix Marketplace. All rights reserved.
           </p>
         </div>
       </div>

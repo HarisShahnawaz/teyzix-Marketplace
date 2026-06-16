@@ -130,7 +130,7 @@ const ServiceDetails = () => {
         headers: getAuthHeader()
       });
 
-      // ... after your successful API creation logic
+      // ... after your successful API creation logic you do this
       navigate('/inbox', { 
         state: { fallbackProvider: service.createdBy } 
       });

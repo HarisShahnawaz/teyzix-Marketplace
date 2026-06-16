@@ -1,15 +1,79 @@
-import { useContext, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useContext, useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { ThemeContext } from '../context/ThemeContext';
-import { Moon, Sun, Menu, X, Search, LogOut, ShieldCheck } from 'lucide-react';
+import { Moon, Sun, Menu, X, Search, LogOut, ShieldCheck, MessageSquare } from 'lucide-react';
+import axios from 'axios';
+import io from 'socket.io-client';
 
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
   const { theme, toggleTheme } = useContext(ThemeContext);
   const navigate = useNavigate();
+  const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [socket, setSocket] = useState(null);
+
+  // Helper function to get auth token
+  const getAuthToken = () => {
+    const storedUser = localStorage.getItem('teyzix_user');
+    if (storedUser) {
+      const parsed = JSON.parse(storedUser);
+      return parsed.token || null;
+    }
+    return null;
+  };
+
+  // Fetch unread message count
+  const fetchUnreadCount = async () => {
+    if (!user) return;
+    try {
+      const token = getAuthToken();
+      const { data } = await axios.get('http://localhost:5000/api/messages/unread-count', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setUnreadCount(data.unreadCount);
+    } catch (error) {
+      console.error('Error fetching unread count:', error);
+    }
+  };
+
+  // Setup Socket.io for real-time unread count updates
+  useEffect(() => {
+    if (user) {
+      const newSocket = io('http://localhost:5000');
+      setSocket(newSocket);
+
+      newSocket.emit('userOnline', user._id);
+
+      newSocket.on('getMessage', (message) => {
+        // If message is not from current user, increment unread count
+        if (message.sender._id !== user._id) {
+          setUnreadCount(prev => prev + 1);
+        }
+      });
+
+      return () => {
+        newSocket.disconnect();
+      };
+    }
+  }, [user]);
+
+  // Fetch unread count on mount and when user changes
+  useEffect(() => {
+    if (user) {
+      fetchUnreadCount();
+    }
+  }, [user]);
+
+  // Reset unread count when navigating to inbox
+  useEffect(() => {
+    if (location.pathname === '/inbox' && user) {
+      setUnreadCount(0);
+    }
+  }, [location.pathname, user]);
 
   const handleLogout = () => {
     logout();
@@ -66,6 +130,16 @@ const Navbar = () => {
 
             {user ? (
               <>
+                {(user.role === 'customer' || user.role === 'provider') && (
+                  <Link to="/inbox" className="hover:text-[#1dbf73] transition-colors flex items-center gap-1 relative">
+                    <MessageSquare size={15} /> Messages
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                      </span>
+                    )}
+                  </Link>
+                )}
                 {user.role === 'customer' && (
                   <Link to="/customer-dashboard" className="hover:text-[#1dbf73] transition-colors flex items-center gap-1">
                     Orders
@@ -169,6 +243,16 @@ const Navbar = () => {
 
           {user ? (
             <>
+              {(user.role === 'customer' || user.role === 'provider') && (
+                <Link to="/inbox" onClick={() => setMobileMenuOpen(false)} className="block py-1 hover:text-[#1dbf73] relative">
+                  Messages
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
+                </Link>
+              )}
               {user.role === 'customer' && (
                 <Link to="/customer-dashboard" onClick={() => setMobileMenuOpen(false)} className="block py-1 hover:text-[#1dbf73]">
                   Buyer Dashboard

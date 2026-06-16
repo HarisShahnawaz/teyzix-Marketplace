@@ -12,6 +12,7 @@ import AdminDashboard from './dashboards/AdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import AIAssistant from './components/AIAssistant'; 
 import ServiceDetails from './pages/ServiceDetails';
+import Inbox from './pages/Inbox';
 
 function App() {
   return (
@@ -26,6 +27,14 @@ function App() {
                 <Route path="/services/:id" element={<ServiceDetails />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route 
+                  path="/inbox" 
+                  element={
+                    <ProtectedRoute allowedRoles={['customer', 'provider']}>
+                      <Inbox />
+                    </ProtectedRoute>
+                  } 
+                />
                 
                 <Route 
                   path="/provider-dashboard" 

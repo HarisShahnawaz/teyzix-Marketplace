@@ -21,7 +21,6 @@ const ServiceDetails = () => {
   useEffect(() => {
     const fetchServiceDetails = async () => {
       try {
-        // Safe Fallback: Fetching full array and filtering client-side
         const { data } = await axios.get(`http://localhost:5000/api/services`);
         const foundService = data.find(s => s._id === id);
         setService(foundService);
@@ -40,7 +39,6 @@ const ServiceDetails = () => {
     fetchServiceDetails();
   }, [id]);
 
-  // 🎨 Smart category fallback images synchronized with homepage architecture
   const getCategoryFallback = (category) => {
     const cat = category?.toLowerCase() || '';
     if (cat.includes('design') || cat.includes('graphic')) {
@@ -50,6 +48,16 @@ const ServiceDetails = () => {
       return "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1200&auto=format&fit=crop";
     }
     return "https://images.unsplash.com/photo-1618477388954-7852f32655ec?q=80&w=1200&auto=format&fit=crop";
+  };
+
+  // 🟩 Helper function to pull the nested token out of 'teyzix_user' safely
+  const getAuthHeader = () => {
+    const storedUser = localStorage.getItem('teyzix_user');
+    if (storedUser) {
+      const parsed = JSON.parse(storedUser);
+      return parsed.token ? { Authorization: `Bearer ${parsed.token}` } : {};
+    }
+    return {};
   };
 
   const handlePlaceOrder = async (e) => {
@@ -79,13 +87,56 @@ const ServiceDetails = () => {
         deadline: deadlineDate.toISOString()
       };
 
-      await axios.post('http://localhost:5000/api/requests', payload);
+      // 🟩 Fixed: Added authorization header configuration object to checkouts
+      await axios.post('http://localhost:5000/api/requests', payload, {
+        headers: getAuthHeader()
+      });
+      
       alert('🎉 Order request submitted successfully!');
       navigate('/customer-dashboard');
     } catch (error) {
       alert(error.response?.data?.error || 'Failed to submit order request.');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleContactMe = async () => {
+    if (!user) {
+      alert('Please sign in to contact the provider.');
+      navigate('/login');
+      return;
+    }
+
+    const providerId = service.createdBy?._id || service.createdBy;
+    if (!providerId) {
+      alert('Error: Could not locate the Service Provider ID.');
+      return;
+    }
+
+    if (user._id === providerId) {
+      alert('You cannot contact yourself.');
+      return;
+    }
+
+    try {
+      const greetingMessage = `Hi! I'm interested in your service: ${service.title}. Could you tell me more about it?`;
+      
+      // 🟩 Fixed: Now successfully passing the verified parsed authorization header string
+      await axios.post('http://localhost:5000/api/messages/send', {
+        receiverId: providerId,
+        text: greetingMessage
+      }, {
+        headers: getAuthHeader()
+      });
+
+      // ... after your successful API creation logic
+      navigate('/inbox', { 
+        state: { fallbackProvider: service.createdBy } 
+      });
+    } catch (error) {
+      console.error('Error sending message:', error);
+      alert(error.response?.data?.message || error.response?.data?.error || 'Failed to send message. Please try again.');
     }
   };
 
@@ -129,7 +180,7 @@ const ServiceDetails = () => {
         {/* 📦 Master Grid System */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
           
-          {/* ================= LEFT MAIN CONTENT PANEL (8 Columns) ================= */}
+          {/* ================= LEFT MAIN CONTENT PANEL ================= */}
           <div className="lg:col-span-8 space-y-8">
             
             {/* Title */}
@@ -207,7 +258,7 @@ const ServiceDetails = () => {
                     </div>
                   </div>
                 </div>
-                <button className="text-xs font-bold border border-slate-300 dark:border-zinc-700 hover:bg-slate-50 dark:hover:bg-zinc-800 text-[#404145] dark:text-zinc-300 px-4 py-2.5 rounded-md transition-all flex items-center justify-center gap-1.5 self-start sm:self-center">
+                <button onClick={handleContactMe} className="text-xs font-bold border border-slate-300 dark:border-zinc-700 hover:bg-slate-50 dark:hover:bg-zinc-800 text-[#404145] dark:text-zinc-300 px-4 py-2.5 rounded-md transition-all flex items-center justify-center gap-1.5 self-start sm:self-center">
                   <MessageSquare size={13} /> Contact Me
                 </button>
               </div>
@@ -215,7 +266,7 @@ const ServiceDetails = () => {
 
           </div>
 
-          {/* ================= RIGHT SIDEBAR PRICE CHECKOUT BOX (4 Columns) ================= */}
+          {/* ================= RIGHT SIDEBAR PRICE CHECKOUT BOX ================= */}
           <div className="lg:col-span-4 lg:sticky lg:top-24 mt-4 lg:mt-0">
             <div className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-lg shadow-md overflow-hidden">
               

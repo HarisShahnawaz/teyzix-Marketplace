@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Send, User, ArrowLeft } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom'; // 🟩 Added useLocation
 import io from 'socket.io-client';
+import { API_URL } from '../config/api';
 
 const Inbox = () => {
   const { user } = useContext(AuthContext);
@@ -38,7 +39,7 @@ const Inbox = () => {
   // Setup Socket.io connection
   useEffect(() => {
     if (user) {
-      const newSocket = io('http://localhost:5000');
+      const newSocket = io(API_URL);
       setSocket(newSocket);
 
       // Emit user online event
@@ -71,7 +72,7 @@ const Inbox = () => {
   const fetchConversations = async () => {
     try {
       const token = getAuthToken(); // 🟩 Fixed Token Pointer
-      const { data } = await axios.get('http://localhost:5000/api/messages/conversations', {
+      const { data } = await axios.get(`${API_URL}/api/messages/conversations`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setConversations(data);
@@ -108,7 +109,7 @@ const Inbox = () => {
   const fetchMessages = async (conversationId) => {
     try {
       const token = getAuthToken(); // 🟩 Fixed Token Pointer
-      const { data } = await axios.get(`http://localhost:5000/api/messages/history/${conversationId}`, {
+      const { data } = await axios.get(`${API_URL}/api/messages/history/${conversationId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setMessages(data);
@@ -126,7 +127,7 @@ const Inbox = () => {
       // Mark messages as read when conversation is opened
       try {
         const token = getAuthToken();
-        await axios.put(`http://localhost:5000/api/messages/mark-read/${conversation._id}`, {}, {
+        await axios.put(`${API_URL}/api/messages/mark-read/${conversation._id}`, {}, {
           headers: { Authorization: `Bearer ${token}` }
         });
       } catch (error) {
@@ -148,7 +149,7 @@ const Inbox = () => {
         ? selectedConversation.participants[0]._id 
         : selectedConversation.participants.find(p => p._id !== user._id)?._id || selectedConversation.participants[0]._id;
       
-      const { data } = await axios.post('http://localhost:5000/api/messages/send', {
+      const { data } = await axios.post(`${API_URL}/api/messages/send`, {
         receiverId: recipientId,
         text: newMessage
       }, {

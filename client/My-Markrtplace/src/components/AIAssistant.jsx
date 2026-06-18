@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
+import { API_URL } from '../config/api';
 
 const AIAssistant = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -19,7 +20,7 @@ const AIAssistant = () => {
     setLoading(true);
 
     try {
-      const { data } = await axios.post('http://localhost:5000/api/ai', { message: userMessage.text });
+      const { data } = await axios.post(`${API_URL}/api/ai`, { message: userMessage.text });
       setMessages((prev) => [...prev, { role: 'assistant', text: data.reply }]);
     } catch (error) {
       setMessages((prev) => [...prev, { role: 'assistant', text: "Can't connect to server right now." }]);

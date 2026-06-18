@@ -5,6 +5,7 @@ import { AuthContext } from '../context/AuthContext';
 import { motion } from 'framer-motion';
 import { Star, ArrowRight, Tag } from 'lucide-react';
 import heroImg from '../assets/hero.png';
+import { API_URL } from '../config/api';
 
 const Home = () => {
   const [services, setServices] = useState([]);
@@ -14,7 +15,7 @@ const Home = () => {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const { data } = await axios.get('http://localhost:5000/api/services');
+        const { data } = await axios.get(`${API_URL}/api/services`);
         setServices(data);
       } catch (error) {
         console.error("Error fetching marketplace services:", error);
@@ -107,10 +108,10 @@ const Home = () => {
             {services.map((service) => {
               
               // Dynamic banner with distinct smart fallbacks
-              const cardBanner = 
-                (service.image && service.image.startsWith('http') ? service.image : (service.image ? `http://localhost:5000${service.image}` : null)) || 
+              const cardBanner =
+                (service.image && service.image.startsWith('http') ? service.image : (service.image ? `${API_URL}${service.image}` : null)) ||
                 service.coverImage ||
-                service.banner || 
+                service.banner ||
                 (service.images && service.images.length > 0 ? service.images[0] : null) || 
                 getCategoryFallback(service.category);
 

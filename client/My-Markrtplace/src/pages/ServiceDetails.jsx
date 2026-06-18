@@ -4,6 +4,7 @@ import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import { motion } from 'framer-motion';
 import { Clock, RefreshCw, Star, ShieldAlert, ChevronRight, MessageSquare, Tag } from 'lucide-react';
+import { API_URL } from '../config/api';
 
 const ServiceDetails = () => {
   const { id } = useParams();
@@ -21,10 +22,10 @@ const ServiceDetails = () => {
   useEffect(() => {
     const fetchServiceDetails = async () => {
       try {
-        const { data } = await axios.get(`http://localhost:5000/api/services`);
+        const { data } = await axios.get(`${API_URL}/api/services`);
         const foundService = data.find(s => s._id === id);
         setService(foundService);
-        
+
         if (foundService) {
           setCustomBudget(foundService.price || '');
           const baselineDays = parseInt(foundService.deliveryTime) || 7;
@@ -88,7 +89,7 @@ const ServiceDetails = () => {
       };
 
       // 🟩 Fixed: Added authorization header configuration object to checkouts
-      await axios.post('http://localhost:5000/api/requests', payload, {
+      await axios.post(`${API_URL}/api/requests`, payload, {
         headers: getAuthHeader()
       });
       
@@ -121,9 +122,9 @@ const ServiceDetails = () => {
 
     try {
       const greetingMessage = `Hi! I'm interested in your service: ${service.title}. Could you tell me more about it?`;
-      
+
       // 🟩 Fixed: Now successfully passing the verified parsed authorization header string
-      await axios.post('http://localhost:5000/api/messages/send', {
+      await axios.post(`${API_URL}/api/messages/send`, {
         receiverId: providerId,
         text: greetingMessage
       }, {
@@ -156,7 +157,7 @@ const ServiceDetails = () => {
     );
   }
 
-  const cardBanner = (service.image && service.image.startsWith('http') ? service.image : (service.image ? `http://localhost:5000${service.image}` : null)) || service.coverImage || service.banner || (service.images && service.images.length > 0 ? service.images[0] : null) || getCategoryFallback(service.category);
+  const cardBanner = (service.image && service.image.startsWith('http') ? service.image : (service.image ? `${API_URL}${service.image}` : null)) || service.coverImage || service.banner || (service.images && service.images.length > 0 ? service.images[0] : null) || getCategoryFallback(service.category);
   const sellerName = service.createdBy?.name || "Haris";
   const initials = sellerName.substring(0, 2).toUpperCase();
 

@@ -2,6 +2,7 @@ import { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import { motion } from 'framer-motion';
+import { API_URL } from '../config/api';
 
 const ProviderDashboard = () => {
   const { user } = useContext(AuthContext);
@@ -19,13 +20,13 @@ const ProviderDashboard = () => {
 
   const fetchData = async () => {
     try {
-      const servicesRes = await axios.get('http://localhost:5000/api/services');
+      const servicesRes = await axios.get(`${API_URL}/api/services`);
       const filteredServices = servicesRes.data.filter(
         (s) => (s.createdBy?._id || s.createdBy) === user?._id
       );
       setMyServices(filteredServices);
 
-      const ordersRes = await axios.get('http://localhost:5000/api/requests/my-requests');
+      const ordersRes = await axios.get(`${API_URL}/api/requests/my-requests`);
       setIncomingOrders(ordersRes.data);
     } catch (error) {
       console.error("Error fetching provider dashboard data:", error);
@@ -59,7 +60,7 @@ const ProviderDashboard = () => {
         formData.append('image', image);
       }
 
-      await axios.post('http://localhost:5000/api/services', formData, {
+      await axios.post(`${API_URL}/api/services`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -84,7 +85,7 @@ const ProviderDashboard = () => {
     if (newStatus === 'completed') formattedStatus = 'Completed';
 
     try {
-      await axios.put(`http://localhost:5000/api/requests/${orderId}`, {
+      await axios.put(`${API_URL}/api/requests/${orderId}`, {
         status: formattedStatus
       });
       

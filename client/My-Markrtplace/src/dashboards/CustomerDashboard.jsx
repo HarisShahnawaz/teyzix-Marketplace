@@ -2,6 +2,7 @@ import { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import { motion } from 'framer-motion';
+import { API_URL } from '../config/api';
 import { Star } from 'lucide-react';
 
 const CustomerDashboard = () => {
@@ -14,7 +15,7 @@ const CustomerDashboard = () => {
   useEffect(() => {
     const fetchCustomerRequests = async () => {
       try {
-        const { data } = await axios.get('http://localhost:5000/api/requests/my-requests');
+        const { data } = await axios.get(`${API_URL}/api/requests/my-requests`);
         setRequests(data);
       } catch (error) {
         console.error("Error fetching order requests:", error);
@@ -41,7 +42,7 @@ const CustomerDashboard = () => {
     e.preventDefault();
     setSubmittingReview(true);
     try {
-      await axios.post('http://localhost:5000/api/reviews', {
+      await axios.post(`${API_URL}/api/reviews`, {
         serviceId: reviewForm.serviceId,
         providerId: reviewForm.providerId,
         rating: reviewForm.rating,

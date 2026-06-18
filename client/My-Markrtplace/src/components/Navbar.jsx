@@ -5,6 +5,7 @@ import { ThemeContext } from '../context/ThemeContext';
 import { Moon, Sun, Menu, X, Search, LogOut, ShieldCheck, MessageSquare } from 'lucide-react';
 import axios from 'axios';
 import io from 'socket.io-client';
+import { API_URL } from '../config/api';
 
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
@@ -31,7 +32,7 @@ const Navbar = () => {
     if (!user) return;
     try {
       const token = getAuthToken();
-      const { data } = await axios.get('http://localhost:5000/api/messages/unread-count', {
+      const { data } = await axios.get(`${API_URL}/api/messages/unread-count`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUnreadCount(data.unreadCount);
@@ -43,7 +44,7 @@ const Navbar = () => {
   // Setup Socket.io for real-time unread count updates
   useEffect(() => {
     if (user) {
-      const newSocket = io('http://localhost:5000');
+      const newSocket = io(API_URL);
       setSocket(newSocket);
 
       newSocket.emit('userOnline', user._id);

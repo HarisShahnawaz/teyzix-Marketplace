@@ -14,6 +14,7 @@ const Inbox = () => {
 
   const [conversations, setConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
+  const [isChatOpen, setIsChatOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
@@ -89,6 +90,7 @@ const Inbox = () => {
         if (matchingChat) {
           setSelectedConversation(matchingChat);
           fetchMessages(matchingChat._id);
+          setIsChatOpen(true);
         } else {
           // Instantly open a local mock UI session structure so the user can type straight away
           setSelectedConversation({
@@ -97,6 +99,7 @@ const Inbox = () => {
             isTempPlaceholder: true
           });
           setMessages([]);
+          setIsChatOpen(true);
         }
       }
     } catch (error) {
@@ -120,6 +123,7 @@ const Inbox = () => {
 
   const handleConversationClick = async (conversation) => {
     setSelectedConversation(conversation);
+    setIsChatOpen(true);
     if (conversation.isTempPlaceholder) {
       setMessages([]);
     } else {
@@ -212,10 +216,10 @@ const Inbox = () => {
       </div>
 
       <div className="max-w-7xl mx-auto p-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-200px)]">
+        <div className="flex h-[calc(100vh-200px)] bg-white dark:bg-zinc-900 rounded-xl border border-slate-200 dark:border-zinc-800 overflow-hidden">
           
           {/* Left Navigation Column - Conversations List */}
-          <div className="lg:col-span-1 bg-white dark:bg-zinc-900 rounded-xl border border-slate-200 dark:border-zinc-800 overflow-hidden flex flex-col">
+          <div className={`w-full md:w-80 border-r border-slate-200 dark:border-zinc-800 flex flex-col ${isChatOpen ? 'hidden md:block' : 'block'}`}>
             <div className="p-4 border-b border-slate-200 dark:border-zinc-800">
               <h2 className="text-lg font-bold text-slate-900 dark:text-zinc-100">Conversations</h2>
             </div>
@@ -282,9 +286,9 @@ const Inbox = () => {
               )}
             </div>
           </div>
-
+ 
           {/* Right Messaging Window */}
-          <div className="lg:col-span-2 bg-white dark:bg-zinc-900 rounded-xl border border-slate-200 dark:border-zinc-800 overflow-hidden flex flex-col">
+          <div className={`flex-1 flex flex-col ${!isChatOpen ? 'hidden md:flex' : 'flex'}`}>
             {!selectedConversation ? (
               <div className="flex-1 flex items-center justify-center">
                 <div className="text-center">
@@ -296,6 +300,13 @@ const Inbox = () => {
               <>
                 {/* Chat Header */}
                 <div className="p-4 border-b border-slate-200 dark:border-zinc-800 flex items-center gap-3">
+                  <button 
+                    onClick={() => setIsChatOpen(false)}
+                    className="block md:hidden flex items-center gap-1.5 text-[#1dbf73] hover:text-[#19a463] font-semibold text-sm transition-colors mr-2"
+                  >
+                    <ArrowLeft size={16} />
+                    <span>Back to Lists</span>
+                  </button>
                   <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold rounded-full flex items-center justify-center">
                     {currentRecipient.name.charAt(0).toUpperCase()}
                   </div>

@@ -179,10 +179,10 @@ const ServiceDetails = () => {
         </div>
 
         {/* 📦 Master Grid System */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
           
           {/* ================= LEFT MAIN CONTENT PANEL ================= */}
-          <div className="lg:col-span-8 space-y-8">
+          <div className="lg:col-span-2 space-y-6">
             
             {/* Title */}
             <h1 className="text-2xl md:text-3xl font-extrabold text-[#222325] dark:text-zinc-100 leading-tight tracking-tight capitalize">
@@ -259,7 +259,7 @@ const ServiceDetails = () => {
                     </div>
                   </div>
                 </div>
-                <button onClick={handleContactMe} className="text-xs font-bold border border-slate-300 dark:border-zinc-700 hover:bg-slate-50 dark:hover:bg-zinc-800 text-[#404145] dark:text-zinc-300 px-4 py-2.5 rounded-md transition-all flex items-center justify-center gap-1.5 self-start sm:self-center">
+                <button onClick={handleContactMe} className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white hover:bg-zinc-50 text-gray-700 font-semibold text-sm border border-gray-300 rounded-lg shadow-sm hover:shadow transition-all duration-200">
                   <MessageSquare size={13} /> Contact Me
                 </button>
               </div>
@@ -268,7 +268,7 @@ const ServiceDetails = () => {
           </div>
 
           {/* ================= RIGHT SIDEBAR PRICE CHECKOUT BOX ================= */}
-          <div className="lg:col-span-4 lg:sticky lg:top-24 mt-4 lg:mt-0">
+          <div className="lg:col-span-1 lg:sticky lg:top-24">
             <div className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-lg shadow-md overflow-hidden">
               
               {/* Tab Selector Headers */}

@@ -12,10 +12,9 @@ export const ThemeProvider = ({ children }) => {
       setTheme(savedTheme);
       document.documentElement.classList.toggle('dark', savedTheme === 'dark');
     } else {
-      // Check system preference
-      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      setTheme(systemPrefersDark ? 'dark' : 'light');
-      document.documentElement.classList.toggle('dark', systemPrefersDark);
+      // Default to light layout
+      setTheme('light');
+      document.documentElement.classList.remove('dark');
     }
   }, []);
 

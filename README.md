@@ -3,7 +3,7 @@
 A full-stack, production-ready freelance services marketplace built with the **MERN stack** (MongoDB, Express, React, Node.js). TeyzixMarket connects clients with skilled service providers, featuring real-time messaging, AI-powered assistance, role-based dashboards, and a clean, responsive UI.
 
 > 🌐 **Live Demo:** [teyzix-marketplace-theta.vercel.app](https://teyzix-marketplace-theta.vercel.app)
-
+> 🎥 **Video Demo:** [Google Drive Video Walkthrough](https://drive.google.com/file/d/1Sgfi06vGYVczOophvJwy3LfPnh1jwiOG/view?usp=sharing)
 ---
 
 ## 📸 Screenshots

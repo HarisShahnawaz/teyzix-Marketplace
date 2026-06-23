@@ -6,6 +6,8 @@ import { motion } from 'framer-motion';
 import { Star, ArrowRight, Tag } from 'lucide-react';
 import heroImg from '../assets/hero.png';
 import { API_URL } from '../config/api';
+import AboutUs from '../components/AboutUs';
+import ContactUs from '../components/ContactUs';
 
 const Home = () => {
   const [services, setServices] = useState([]);
@@ -212,6 +214,12 @@ const Home = () => {
           </div>
         )}
       </div>
+
+      {/* About Us Section */}
+      <AboutUs />
+
+      {/* Contact Us Section */}
+      <ContactUs />
 
     </motion.div>
   );

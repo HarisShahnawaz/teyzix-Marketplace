@@ -12,6 +12,17 @@ const CustomerDashboard = () => {
   const [reviewForm, setReviewForm] = useState({ visible: false, requestId: null, serviceId: null, providerId: null, rating: 5, comment: '' });
   const [submittingReview, setSubmittingReview] = useState(false);
 
+  const getCategoryFallback = (category) => {
+    const cat = category?.toLowerCase() || '';
+    if (cat.includes('design') || cat.includes('graphic')) {
+      return "https://images.unsplash.com/photo-1626785774573-4b799315345d?q=80&w=600&auto=format&fit=crop";
+    }
+    if (cat.includes('marketing') || cat.includes('digital')) {
+      return "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=600&auto=format&fit=crop";
+    }
+    return "https://images.unsplash.com/photo-1618477388954-7852f32655ec?q=80&w=600&auto=format&fit=crop";
+  };
+
   useEffect(() => {
     const fetchCustomerRequests = async () => {
       try {
@@ -89,48 +100,76 @@ const CustomerDashboard = () => {
               <p className="text-xs text-slate-400 dark:text-zinc-500 mt-1 transition-colors duration-300">Head over to the home page to explore professional services!</p>
             </div>
           ) : (
-            <div className="space-y-4">
-              {requests.map((req) => (
-                <motion.div
-                  key={req._id}
-                  whileHover={{ y: -4, scale: 1.01 }}
-                  className="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-md hover:shadow-xl dark:shadow-none flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 transition-all duration-300 ease-in-out"
-                >
-                  <div className="space-y-2">
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-zinc-100 tracking-tight transition-colors duration-300">
-                      {req.service?.title || 'Custom Freelance Project'}
-                    </h3>
-                    <p className="text-slate-600 dark:text-zinc-400 text-sm max-w-md transition-colors duration-300">
-                      <strong className="text-slate-700 dark:text-zinc-300">Project Requirements:</strong> {req.requirements || 'No specific notes added.'}
-                    </p>
-                    <p className="text-xs text-slate-400 dark:text-zinc-500 font-mono transition-colors duration-300">Order ID: {req._id}</p>
-                  </div>
-                  
-                  <div className="text-right space-y-3">
-                    <span className={`inline-block px-3 py-1 text-xs font-semibold rounded-full tracking-wider transition-colors duration-300 ${
-                      req.status === 'Completed' || req.status === 'Delivered' ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400' :
-                      req.status === 'Accepted' || req.status === 'In Progress' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400' :
-                      req.status === 'Rejected' || req.status === 'Cancelled' ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400' :
-                      'bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400'
-                    }`}>
-                      {req.status || 'Pending'}
-                    </span>
-                    <div className="text-lg font-black text-slate-900 dark:text-zinc-100 transition-colors duration-300">${req.budget || req.service?.price || '0'}</div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {requests.map((req) => {
+                const category = req.service?.category || '';
+                const cardBanner = req.service?.image 
+                  ? (req.service.image.startsWith('http') ? req.service.image : `${API_URL}${req.service.image}`) 
+                  : getCategoryFallback(category);
+
+                return (
+                  <motion.div
+                    key={req._id}
+                    whileHover={{ y: -4 }}
+                    className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition duration-300 flex flex-col h-full group"
+                  >
+                    <div className="block relative h-40 w-full overflow-hidden bg-slate-50 dark:bg-zinc-800">
+                      <img 
+                        src={cardBanner} 
+                        alt={req.service?.title || 'Project Image'} 
+                        className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
+                        onError={(e) => { e.target.src = getCategoryFallback(category); }}
+                      />
+                    </div>
                     
-                    {(req.status === 'Completed' || req.status === 'Delivered') && (
-                      <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.96 }}
-                        onClick={() => handleLeaveReview(req)}
-                        className="w-full bg-yellow-500 hover:bg-yellow-600 dark:bg-yellow-600 dark:hover:bg-yellow-500 text-white font-medium px-4 py-2 rounded-lg transition-all duration-300 shadow-sm flex items-center justify-center gap-2"
-                      >
-                        <Star size={16} fill="currentColor" />
-                        Leave a Review
-                      </motion.button>
-                    )}
-                  </div>
-                </motion.div>
-              ))}
+                    <div className="p-5 flex flex-col flex-grow">
+                      <div className="flex items-start justify-between gap-3 mb-3">
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-zinc-100 tracking-tight transition-colors duration-300 line-clamp-2">
+                          {req.service?.title || 'Custom Freelance Project'}
+                        </h3>
+                        <span className={`flex-shrink-0 inline-block px-3 py-1 text-xs font-medium rounded-full tracking-wider transition-colors duration-300 ${
+                          req.status === 'Completed' || req.status === 'Delivered' ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400' :
+                          req.status === 'Accepted' || req.status === 'In Progress' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400' :
+                          req.status === 'Rejected' || req.status === 'Cancelled' ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400' :
+                          'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400'
+                        }`}>
+                          {req.status || 'Pending'}
+                        </span>
+                      </div>
+
+                      <div className="p-3 bg-gray-50 dark:bg-zinc-800/50 rounded-xl mt-2 mb-3 border border-gray-100 dark:border-zinc-800">
+                        <strong className="text-xs font-bold text-slate-700 dark:text-zinc-300 uppercase tracking-wider block mb-1">Project Requirements:</strong>
+                        <p className="text-sm text-slate-600 dark:text-zinc-400 line-clamp-3">
+                          {req.requirements || 'No specific notes added.'}
+                        </p>
+                      </div>
+
+                      <span className="text-xs font-mono text-gray-400 dark:text-zinc-500 mb-4 block">Order ID: {req._id}</span>
+                      
+                      <div className="mt-auto pt-4 border-t border-slate-100 dark:border-zinc-800 flex justify-between items-center transition-colors duration-300">
+                        <span className="text-sm font-semibold text-slate-500 hover:text-blue-600 dark:text-zinc-400 dark:hover:text-blue-400 cursor-pointer transition-colors">
+                          Track Progress
+                        </span>
+                        <div className="text-xl font-bold text-slate-800 dark:text-zinc-100 transition-colors duration-300">
+                          ${req.budget || req.service?.price || '0'}
+                        </div>
+                      </div>
+
+                      {(req.status === 'Completed' || req.status === 'Delivered') && (
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => handleLeaveReview(req)}
+                          className="w-full mt-4 bg-yellow-500 hover:bg-yellow-600 dark:bg-yellow-600 dark:hover:bg-yellow-500 text-white font-semibold px-4 py-2.5 rounded-xl transition-all duration-300 shadow-sm flex items-center justify-center gap-2 text-sm"
+                        >
+                          <Star size={16} fill="currentColor" />
+                          Leave a Review
+                        </motion.button>
+                      )}
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
           )}
         </div>

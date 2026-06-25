@@ -13,6 +13,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import AIAssistant from './components/AIAssistant'; 
 import ServiceDetails from './pages/ServiceDetails';
 import Inbox from './pages/Inbox';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
 
 function App() {
   return (
@@ -27,6 +29,8 @@ function App() {
                 <Route path="/services/:id" element={<ServiceDetails />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/privacy" element={<PrivacyPolicy />} />
+                <Route path="/terms" element={<TermsOfService />} />
                 <Route 
                   path="/inbox" 
                   element={

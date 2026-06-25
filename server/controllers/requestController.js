@@ -33,7 +33,7 @@ export const getUserRequests = async (req, res) => {
     const requests = await Request.find(query)
       .populate('customer', 'name email')
       .populate('provider', 'name email')
-      .populate('service', 'title price');
+      .populate('service', 'title price image category');
 
     res.json(requests);
   } catch (error) {

@@ -18,6 +18,17 @@ const ProviderDashboard = () => {
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState('');
 
+  const getCategoryFallback = (category) => {
+    const cat = category?.toLowerCase() || '';
+    if (cat.includes('design') || cat.includes('graphic')) {
+      return "https://images.unsplash.com/photo-1626785774573-4b799315345d?q=80&w=600&auto=format&fit=crop";
+    }
+    if (cat.includes('marketing') || cat.includes('digital')) {
+      return "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=600&auto=format&fit=crop";
+    }
+    return "https://images.unsplash.com/photo-1618477388954-7852f32655ec?q=80&w=600&auto=format&fit=crop";
+  };
+
   const fetchData = async () => {
     try {
       const servicesRes = await axios.get(`${API_URL}/api/services`);
@@ -209,25 +220,63 @@ const ProviderDashboard = () => {
               <p className="text-xs text-slate-400 dark:text-zinc-500 mt-1 transition-colors duration-300">Use the sidebar form to post your first gig!</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {myServices.map((service) => (
-                <motion.div
-                  key={service._id}
-                  whileHover={{ y: -4, scale: 1.015 }}
-                  className="bg-white dark:bg-zinc-900 p-5 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-md hover:shadow-xl dark:shadow-none flex flex-col justify-between transition-all duration-300 ease-in-out"
-                >
-                  <div>
-                    <h3 className="font-bold text-slate-900 dark:text-zinc-100 text-lg transition-colors duration-300">{service.title}</h3>
-                    <p className="text-slate-500 dark:text-zinc-400 text-xs mt-1 line-clamp-2 transition-colors duration-300">{service.description}</p>
-                  </div>
-                  <div className="flex justify-between items-center mt-4 pt-3 border-t border-slate-100 dark:border-zinc-800 transition-colors duration-300">
-                    <span className="text-[11px] font-semibold bg-slate-100 dark:bg-zinc-700 text-slate-600 dark:text-zinc-300 px-2 py-0.5 rounded transition-colors duration-300">
-                      {service.category}
-                    </span>
-                    <span className="font-bold text-green-600 dark:text-green-400 transition-colors duration-300">${service.price}</span>
-                  </div>
-                </motion.div>
-              ))}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {myServices.map((service) => {
+                const cardBanner = service.image 
+                  ? (service.image.startsWith('http') ? service.image : `${API_URL}${service.image}`) 
+                  : getCategoryFallback(service.category);
+                  
+                return (
+                  <motion.div
+                    key={service._id}
+                    whileHover={{ y: -4 }}
+                    className="bg-white dark:bg-zinc-900 rounded-xl shadow-xs hover:shadow-md border border-slate-200/60 dark:border-zinc-800 flex flex-col justify-between overflow-hidden transition-all duration-200 group h-full"
+                  >
+                    <div>
+                      <div className="block relative aspect-video w-full overflow-hidden bg-slate-50 dark:bg-zinc-800">
+                        <img 
+                          src={cardBanner} 
+                          alt={service.title} 
+                          className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
+                          onError={(e) => { e.target.src = getCategoryFallback(service.category); }}
+                        />
+                      </div>
+                      
+                      <div className="p-4 space-y-2.5">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-[#1dbf73] to-emerald-600 text-white flex-shrink-0 flex items-center justify-center text-[10px] font-bold uppercase tracking-tight">
+                            {user?.name?.charAt(0).toUpperCase() || 'U'}
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-xs font-semibold text-slate-800 dark:text-zinc-200 truncate max-w-[140px]">
+                              {user?.name || 'Provider'}
+                            </span>
+                            <span className="text-[9px] text-[#1dbf73] font-medium -mt-0.5">Verified Provider</span>
+                          </div>
+                        </div>
+
+                        <div className="space-y-1">
+                          <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100 hover:text-[#1dbf73] transition-colors line-clamp-1 capitalize tracking-tight">
+                            {service.title}
+                          </h3>
+                          <p className="text-xs text-slate-500 dark:text-zinc-400 line-clamp-2 min-h-[32px] leading-relaxed">
+                            {service.description || "No specific details provided for this listing."}
+                          </p>
+                        </div>
+
+                        <div className="flex items-center justify-between pt-1 border-t border-slate-50 dark:border-zinc-800/50">
+                          <button className="text-xs font-semibold text-[#1dbf73] hover:text-emerald-600 transition-colors duration-300">
+                            Edit Listing
+                          </button>
+                          <span className="text-[10px] font-semibold text-slate-500 dark:text-zinc-400 uppercase tracking-wider">
+                            STARTING AT <span className="text-base font-black text-slate-900 dark:text-zinc-100 ml-0.5">${service.price}</span>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
           )}
         </div>

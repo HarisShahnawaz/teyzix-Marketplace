@@ -104,6 +104,18 @@ const Register = () => {
         >
           {loading ? 'Creating Account...' : 'Register'}
         </motion.button>
+        <div className="flex flex-col sm:flex-row items-center justify-between mt-6 pt-6 border-t border-gray-100 dark:border-slate-800">
+          <span className="text-sm text-slate-600 dark:text-slate-400 mb-4 sm:mb-0">
+            Already have an account?
+          </span>
+          <button
+            type="button"
+            onClick={() => navigate('/login')}
+            className="w-full sm:w-auto flex justify-center py-2.5 px-6 border border-gray-300 dark:border-slate-600 rounded-lg shadow-sm text-sm font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-300"
+          >
+            Sign In
+          </button>
+        </div>
       </motion.form>
     </motion.div>
   );

@@ -12,10 +12,20 @@ const Navbar = () => {
   const { theme, toggleTheme } = useContext(ThemeContext);
   const navigate = useNavigate();
   const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
   const [unreadCount, setUnreadCount] = useState(0);
   const [socket, setSocket] = useState(null);
+
+  // Sync state if URL changes externally
+  useEffect(() => {
+    const currentQuery = new URLSearchParams(location.search).get('search') || '';
+    if (currentQuery !== searchQuery && location.pathname === '/') {
+      setSearchQuery(currentQuery);
+    }
+  }, [location.search, location.pathname]);
 
   // Helper function to get auth token
   const getAuthToken = () => {
@@ -86,6 +96,16 @@ const Navbar = () => {
     e.preventDefault();
     if (searchQuery.trim()) {
       navigate(`/?search=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      navigate('/');
+    }
+  };
+
+  const handleSearchChange = (e) => {
+    const val = e.target.value;
+    setSearchQuery(val);
+    if (location.pathname === '/') {
+      navigate(`/?search=${encodeURIComponent(val)}`, { replace: true });
     }
   };
 
@@ -112,7 +132,7 @@ const Navbar = () => {
               type="text"
               placeholder="What service are you looking for today?"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={handleSearchChange}
               className="w-full h-10 pl-4 pr-12 border border-slate-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-800 text-xs font-normal text-[#404145] dark:text-zinc-200 placeholder-slate-400 focus:outline-none focus:border-slate-400 dark:focus:border-zinc-500 transition-all"
             />
             <button 
@@ -230,7 +250,7 @@ const Navbar = () => {
               type="text"
               placeholder="Search services..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={handleSearchChange}
               className="w-full h-10 pl-3 pr-10 border border-slate-300 dark:border-zinc-700 rounded text-xs bg-slate-50 dark:bg-zinc-800"
             />
             <button type="submit" className="absolute right-3 top-2.5 text-slate-400">

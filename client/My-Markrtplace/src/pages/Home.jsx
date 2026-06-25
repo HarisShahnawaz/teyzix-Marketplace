@@ -1,8 +1,8 @@
 import { useEffect, useState, useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Star, ArrowRight, Tag } from 'lucide-react';
 import heroImg from '../assets/hero.png';
 import { API_URL } from '../config/api';
@@ -13,6 +13,10 @@ const Home = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user } = useContext(AuthContext);
+  const location = useLocation();
+  
+  const searchParams = new URLSearchParams(location.search);
+  const searchQuery = searchParams.get('search') || '';
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -27,6 +31,17 @@ const Home = () => {
     };
     fetchServices();
   }, []);
+
+  const filteredServices = services.filter((service) => {
+    if (!searchQuery) return true;
+    
+    const query = searchQuery.toLowerCase();
+    const titleMatch = service.title?.toLowerCase().includes(query);
+    const descMatch = service.description?.toLowerCase().includes(query);
+    const categoryMatch = service.category?.toLowerCase().includes(query);
+    
+    return titleMatch || descMatch || categoryMatch;
+  });
 
   // 🎨 Smart category fallback images to avoid showing the same laptop for everything
   const getCategoryFallback = (category) => {
@@ -50,41 +65,51 @@ const Home = () => {
     >
       
       {/* 🚀 Dynamic Hero Section */}
-      <div className="bg-white dark:bg-zinc-900 border-b border-slate-100 dark:border-zinc-800 transition-all duration-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          <div className="space-y-6">
-            <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-zinc-100 tracking-tight leading-tight">
-              Find the Perfect <span className="text-[#1dbf73] dark:text-emerald-400">Freelance</span> Services For Your Project
-            </h1>
-            <p className="text-slate-600 dark:text-zinc-400 text-base max-w-md leading-relaxed font-normal">
-              Connect with top-tier service providers, manage milestones, and secure payments flawlessly on TeyzixMarket.
-            </p>
-            {!user && (
-              <div className="flex items-center space-x-4 pt-2">
-                <Link to="/register">
-                  <motion.button
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
-                    className="bg-[#1dbf73] hover:bg-[#19a463] text-white font-bold px-6 py-3 rounded-lg shadow-sm transition-all"
-                  >
-                    Get Started
-                  </motion.button>
-                </Link>
-                <Link to="/login" className="text-slate-700 dark:text-zinc-300 hover:text-[#1dbf73] font-bold px-4 py-2 transition-all">
-                  Sign In
-                </Link>
+      <AnimatePresence>
+        {!searchQuery && (
+          <motion.div 
+            initial={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0, overflow: 'hidden' }}
+            animate={{ opacity: 1, height: 'auto' }}
+            transition={{ duration: 0.4, ease: "easeInOut" }}
+            className="bg-white dark:bg-zinc-900 border-b border-slate-100 dark:border-zinc-800 transition-all duration-300"
+          >
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+              <div className="space-y-6">
+                <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-zinc-100 tracking-tight leading-tight">
+                  Find the Perfect <span className="text-[#1dbf73] dark:text-emerald-400">Freelance</span> Services For Your Project
+                </h1>
+                <p className="text-slate-600 dark:text-zinc-400 text-base max-w-md leading-relaxed font-normal">
+                  Connect with top-tier service providers, manage milestones, and secure payments flawlessly on TeyzixMarket.
+                </p>
+                {!user && (
+                  <div className="flex items-center space-x-4 pt-2">
+                    <Link to="/register">
+                      <motion.button
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
+                        className="bg-[#1dbf73] hover:bg-[#19a463] text-white font-bold px-6 py-3 rounded-lg shadow-sm transition-all"
+                      >
+                        Get Started
+                      </motion.button>
+                    </Link>
+                    <Link to="/login" className="text-slate-700 dark:text-zinc-300 hover:text-[#1dbf73] font-bold px-4 py-2 transition-all">
+                      Sign In
+                    </Link>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-          <div className="flex justify-center">
-            <img 
-              src={heroImg} 
-              alt="Marketplace Hero Illustration" 
-              className="max-h-80 object-contain drop-shadow-md rounded-xl"
-            />
-          </div>
-        </div>
-      </div>
+              <div className="flex justify-center">
+                <img 
+                  src={heroImg} 
+                  alt="Marketplace Hero Illustration" 
+                  className="max-h-80 object-contain drop-shadow-md rounded-xl"
+                />
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* 🟩 Marketplace Services Grid Container */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -101,13 +126,17 @@ const Home = () => {
           <div className="flex justify-center items-center py-16">
             <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#1dbf73]"></div>
           </div>
-        ) : services.length === 0 ? (
+        ) : filteredServices.length === 0 ? (
           <div className="text-center py-12 bg-white dark:bg-zinc-900 rounded-xl border border-dashed border-slate-200 dark:border-zinc-800 shadow-xs">
-            <p className="text-sm text-slate-500 dark:text-zinc-400">No professional services have been listed yet.</p>
+            {searchQuery ? (
+              <p className="text-sm text-slate-500 dark:text-zinc-400">No services found matching your search.</p>
+            ) : (
+              <p className="text-sm text-slate-500 dark:text-zinc-400">No professional services have been listed yet.</p>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {services.map((service) => {
+            {filteredServices.map((service) => {
               
               // Dynamic banner with distinct smart fallbacks
               const cardBanner =

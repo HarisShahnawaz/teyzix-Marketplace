@@ -32,7 +32,7 @@ A full-stack, production-ready freelance services marketplace built with the **M
 ### 🛡️ For Admins
 - Full admin dashboard with user and service management
 - Approve, reject, or remove service listings
-- Monitor platform activity
+- Monitor platform activity effectively
 
 ### 🤖 AI Assistant
 - Floating AI chatbot powered by **Google Gemini** (`@google/genai`)
